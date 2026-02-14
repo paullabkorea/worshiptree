@@ -1,0 +1,77 @@
+{% extends "worship/base.html" %}
+{% load static %}
+{% block title %}내 예배 - 워쉽 트리{% endblock %}
+
+{% block extra_head %}
+<style>
+  #tree-container { width: 100%; height: 500px; border-radius: 12px; overflow: hidden; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Tree visualization -->
+  <div class="col-lg-5 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <strong>나의 워쉽 트리</strong>
+        <span class="badge bg-light text-success">열매 {{ records|length }}개</span>
+      </div>
+      <div id="tree-container"></div>
+    </div>
+  </div>
+
+  <!-- Records list -->
+  <div class="col-lg-7">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">예배 기록</h4>
+      <a href="{% url 'worship:record_create' %}" class="btn btn-success btn-sm">+ 새 기록</a>
+    </div>
+
+    {% if records %}
+    <div class="list-group">
+      {% for r in records %}
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-{{ r.worship_type }}-color me-1">{{ r.get_worship_type_display }}</span>
+            <strong>{{ r.title }}</strong>
+            {% if r.is_shared %}<span class="badge bg-info">공유됨</span>{% endif %}
+          </div>
+          <small class="text-muted">{{ r.date }}</small>
+        </div>
+        {% if r.content %}
+        <p class="text-muted small mt-1 mb-1">{{ r.content|truncatewords:20 }}</p>
+        {% endif %}
+        <div class="mt-1">
+          <a href="{% url 'worship:record_edit' r.pk %}" class="btn btn-outline-secondary btn-sm">수정</a>
+          <form method="post" action="{% url 'worship:record_delete' r.pk %}" class="d-inline"
+                onsubmit="return confirm('정말 삭제하시겠습니까?')">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm">삭제</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <p class="fs-5">아직 예배 기록이 없습니다.</p>
+      <a href="{% url 'worship:record_create' %}" class="btn btn-success">첫 예배를 기록하세요!</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="{% static 'worship/tree.js' %}"></script>
+{% endblock %}

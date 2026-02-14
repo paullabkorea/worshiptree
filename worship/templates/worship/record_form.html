@@ -1,0 +1,38 @@
+{% extends "worship/base.html" %}
+{% block title %}{% if edit %}수정{% else %}새 기록{% endif %} - 워쉽 트리{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title mb-4">{% if edit %}예배 기록 수정{% else %}새 예배 기록{% endif %}</h3>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            {% if field.field.widget.input_type == 'checkbox' %}
+            <div class="form-check">
+              <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                     class="form-check-input" {% if field.value %}checked{% endif %}>
+              <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+            {% else %}
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">{% if edit %}수정{% else %}저장{% endif %}</button>
+            <a href="{% url 'worship:home' %}" class="btn btn-outline-secondary">취소</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

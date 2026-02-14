@@ -1,0 +1,58 @@
+{% extends "worship/base.html" %}
+{% block title %}{{ record.title }} - 워쉽 트리{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <!-- Record -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge bg-secondary">{{ record.get_worship_type_display }}</span>
+            <h4 class="mt-2">{{ record.title }}</h4>
+          </div>
+          <small class="text-muted">{{ record.date }}</small>
+        </div>
+        <p class="text-muted small">{{ record.user.real_name }}</p>
+        <hr>
+        <div class="mb-3" style="white-space: pre-wrap;">{{ record.content }}</div>
+        <div class="d-flex justify-content-between align-items-center">
+          <form method="post" action="{% url 'worship:like_toggle' record.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm {% if user_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+              ❤️ {{ record.like_count }}
+            </button>
+          </form>
+          <a href="{% url 'worship:board_list' %}" class="btn btn-outline-secondary btn-sm">목록으로</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card shadow-sm">
+      <div class="card-header"><strong>댓글 ({{ comments|length }})</strong></div>
+      <div class="card-body">
+        {% for c in comments %}
+        <div class="d-flex mb-3">
+          <div>
+            <strong>{{ c.user.real_name }}</strong>
+            <small class="text-muted ms-2">{{ c.created_at|date:"Y-m-d H:i" }}</small>
+            <p class="mb-0 mt-1">{{ c.content }}</p>
+          </div>
+        </div>
+        {% if not forloop.last %}<hr class="my-2">{% endif %}
+        {% empty %}
+        <p class="text-muted mb-0">아직 댓글이 없습니다.</p>
+        {% endfor %}
+        <hr>
+        <form method="post" action="{% url 'worship:comment_create' record.pk %}">
+          {% csrf_token %}
+          {{ comment_form.content }}
+          <button class="btn btn-success btn-sm mt-2">댓글 작성</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

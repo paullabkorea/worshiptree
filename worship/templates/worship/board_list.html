@@ -1,0 +1,46 @@
+{% extends "worship/base.html" %}
+{% block title %}게시판 - 워쉽 트리{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">예배 나눔 게시판</h3>
+
+{% if records %}
+<div class="list-group mb-4">
+  {% for r in records %}
+  <a href="{% url 'worship:board_detail' r.pk %}" class="list-group-item list-group-item-action">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <span class="badge bg-secondary me-1">{{ r.get_worship_type_display }}</span>
+        <strong>{{ r.title }}</strong>
+      </div>
+      <small class="text-muted">{{ r.date }}</small>
+    </div>
+    <div class="d-flex justify-content-between mt-1">
+      <small class="text-muted">{{ r.user.real_name }}</small>
+      <small class="text-muted">
+        ❤️ {{ r.like_count }}
+        💬 {{ r.comments.count }}
+      </small>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<nav>
+  <ul class="pagination justify-content-center">
+    {% for p in page_range %}
+    <li class="page-item {% if p == page %}active{% endif %}">
+      <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+{% else %}
+<div class="text-center text-muted py-5">
+  <p class="fs-5">아직 공유된 예배 기록이 없습니다.</p>
+</div>
+{% endif %}
+{% endblock %}
